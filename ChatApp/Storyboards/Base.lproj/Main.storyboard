@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="3ES-Zj-eBP">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Home View Controller-->
+        <scene sceneID="nRZ-7s-p2p">
+            <objects>
+                <viewController storyboardIdentifier="HomeViewController" id="zVA-oo-IMP" customClass="HomeViewController" customModule="ChatApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="3Il-bN-qgL">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="s2F-0h-0bj">
+                                <rect key="frame" x="0.0" y="103" width="393" height="715"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ChatTableViewCell" rowHeight="88" id="POI-6N-S4g" customClass="ChatTableViewCell" customModule="ChatApp" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="88"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="POI-6N-S4g" id="mNU-ll-JaA">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="88"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NZd-z6-D0T">
+                                                    <rect key="frame" x="25" y="34" width="343" height="20"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="NZd-z6-D0T" firstAttribute="leading" secondItem="mNU-ll-JaA" secondAttribute="leading" constant="25" id="KXy-K3-0ju"/>
+                                                <constraint firstAttribute="trailing" secondItem="NZd-z6-D0T" secondAttribute="trailing" constant="25" id="Uzv-8k-5Ec"/>
+                                                <constraint firstItem="NZd-z6-D0T" firstAttribute="centerY" secondItem="mNU-ll-JaA" secondAttribute="centerY" id="YI9-Y1-RDO"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="roomTitleLabel" destination="NZd-z6-D0T" id="84E-eP-TkQ"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="faR-d0-iT4"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="faR-d0-iT4" firstAttribute="trailing" secondItem="s2F-0h-0bj" secondAttribute="trailing" id="Gjq-G8-9xw"/>
+                            <constraint firstItem="s2F-0h-0bj" firstAttribute="leading" secondItem="faR-d0-iT4" secondAttribute="leading" id="MjH-bK-Q1Z"/>
+                            <constraint firstItem="s2F-0h-0bj" firstAttribute="top" secondItem="faR-d0-iT4" secondAttribute="top" id="sAD-AC-79j"/>
+                            <constraint firstItem="faR-d0-iT4" firstAttribute="bottom" secondItem="s2F-0h-0bj" secondAttribute="bottom" id="z63-0F-fbq"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="xl7-uZ-YQD">
+                        <barButtonItem key="leftBarButtonItem" title="Logout" id="I9M-yy-xwm"/>
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="plus" catalog="system" id="aw1-dI-lXv"/>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QZW-ou-Vi7" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1063.3587786259541" y="3.5211267605633805"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="4Ps-Qt-YHo">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="3ES-Zj-eBP" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="eTE-on-BLe">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="zVA-oo-IMP" kind="relationship" relationship="rootViewController" id="Wao-wZ-4rV"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Cqy-C2-JdP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="136.64122137404578" y="3.5211267605633805"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="plus" catalog="system" width="128" height="113"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
