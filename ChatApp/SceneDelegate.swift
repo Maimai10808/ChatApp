@@ -5,6 +5,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -15,12 +16,39 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+        
+        
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        // Try to cast the incoming UIScene into a UIWindowScene; if it fails, exit early
+
         self.window = UIWindow(windowScene: windowScene)
-        let authStoryboard = UIStoryboard(name: "Auth", bundle: nil)
-        let signinVC = authStoryboard.instantiateViewController(withIdentifier: "SignInViewController")
-        self.window?.rootViewController = signinVC
+        // Create a new window associated with the scene
+        
+        // This is the standard way to initialize your app’s main window
+        // in modern iOS apps (iOS 13 and above) using SceneDelegate,
+        // because Apple introduced support for multiple windows per app.
+
+        
+        
+        if Auth.auth().currentUser != nil {
+            let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            let homeVC = mainStoryboard.instantiateViewController(withIdentifier: "HomeViewController")
+            let navVC = UINavigationController(rootViewController: homeVC)
+            
+            self.window?.rootViewController = navVC
+        } else {
+            let authStoryboard = UIStoryboard(name: "Auth", bundle: nil)
+            let signinVC = authStoryboard.instantiateViewController(withIdentifier: "SignInViewController")
+            
+            self.window?.rootViewController = signinVC
+        }
+        
+        
+        
+        
+        
         self.window?.makeKeyAndVisible()
+        
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
