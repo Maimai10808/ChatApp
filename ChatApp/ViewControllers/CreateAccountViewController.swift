@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseAuth
+import FirebaseDatabase
 
 class CreateAccountViewController: UIViewController {
     
@@ -161,10 +162,21 @@ class CreateAccountViewController: UIViewController {
                 return
             }
             
-            if let user = Auth.auth().currentUser {
-                    print("User ID: \(user.uid)")
+            guard let result = result else {
+                self.presentErrorAlert(title  : "Create Account Failed",
+                                       message: "Something went wrong. Please try again later.")
+                return
             }
             
+            let userId = result.user.uid
+            let userData: [String: Any] = [
+                "id": userId,
+                "username": username
+            ]
+            
+            Database.database().reference().child("users").child(userId).setValue(userData)
+            
+            // child(userId) make sure every users is unique the following users can't cover the later users
             
         }
         
