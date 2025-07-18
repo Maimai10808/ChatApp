@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class CreateAccountViewController: UIViewController {
     
@@ -124,10 +125,53 @@ class CreateAccountViewController: UIViewController {
     }
 
     
-    @IBAction func createAccountButtonTapped(_ sender: Any) {
-    }
     
-
+    
+    @IBAction func createAccountButtonTapped(_ sender: Any) {
+        
+        guard let username = usernameTextField.text else {
+            presentErrorAlert(title  : "Username Required",
+                              message: "Please enter a username to continue.")
+            return
+        }
+        
+        guard username.count >= 1 && username.count <= 15 else {
+            presentErrorAlert(title: "Invalid Username", message: "Username must be 1–15 characters long.")
+            return
+        }
+        
+        guard let email    = emailTextField   .text else{
+            presentErrorAlert(title  : "Email Required",
+                              message: "Please enter a Email to continue.")
+            return
+        }
+        
+        guard let password = passwordTextField.text else {
+            presentErrorAlert(title  : "Password Required",
+                              message: "Please enter a Password to continue.")
+            return
+        }
+        
+        
+        Auth.auth().createUser(withEmail: email, password: password) { result, error in
+            if let error = error {
+                print(error.localizedDescription)
+                self.presentErrorAlert(title  : "Create Account Failed",
+                                       message: "Something went wrong. Please try again later.")
+                return
+            }
+            
+            if let user = Auth.auth().currentUser {
+                    print("User ID: \(user.uid)")
+            }
+            
+            
+        }
+        
+        
+        
+        
+    }
 }
 
 extension CreateAccountViewController: UITextViewDelegate {
