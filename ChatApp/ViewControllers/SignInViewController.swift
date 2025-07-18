@@ -27,7 +27,7 @@ class SignInViewController: UIViewController {
         
         attributedString.addAttribute(
             .link,
-            value: "chatapp://createAccount",
+            value: "chatappcreate://createAccount",
             range: (attributedString.string as NSString).range(of: "Create an acount here"))
         
         createAccountTextView.attributedText     = attributedString
@@ -54,7 +54,7 @@ extension SignInViewController: UITextViewDelegate {
     
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         
-        if URL.scheme == "chatapp" {
+        if URL.scheme == "chatappcreate" {
             performSegue(withIdentifier: "CreateAccountSegue", sender: nil)
         }
         
