@@ -19,9 +19,10 @@ class CreateAccountViewController: UIViewController {
     
     var activeTextField: UITextField?
     
+    
     override func viewWillAppear(_ animated: Bool) {
                   super.viewWillAppear(animated)
-                   registerKeyboardNotifications()
+        registerKeyboardNotifications()
        }
     
 
@@ -32,24 +33,8 @@ class CreateAccountViewController: UIViewController {
         emailTextField   .delegate = self
         passwordTextField.delegate = self
         
-        containerView.clipsToBounds = true
-        containerView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        
-        let attributedString = NSMutableAttributedString(
-            string    : "Alreay have an account? Sign in here.",
-            attributes: [NSAttributedString.Key.font : Font.linkLabel])
-        
-        attributedString.addAttribute(
-            .link,
-            value: "chatsignin://signinAccount",
-            range: (attributedString.string as NSString).range(of: "Sign in here"))
-        
-        signinAccountTextView.attributedText     = attributedString
-        signinAccountTextView.linkTextAttributes = [.foregroundColor: UIColor.secondary, .font: Font.linkLabel]
-        signinAccountTextView.delegate           = self
-        signinAccountTextView.isScrollEnabled    = false
-        signinAccountTextView.textAlignment      = .center
-        signinAccountTextView.isEditable         = false
+        drawcontainerView()
+        drawcreateAccountTextView()
         
         tapRecognizerDismissKeyBoard()
     }
@@ -61,8 +46,10 @@ class CreateAccountViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
                  super.viewWillDisappear(animated)
-                   removeKeyboardNotifications()
+        removeKeyboardNotifications()
        }
+    
+    
     
     func registerKeyboardNotifications() {
             NotificationCenter.default.addObserver(self,
@@ -112,6 +99,29 @@ class CreateAccountViewController: UIViewController {
         @objc func dismissKeyboard() {
             view.endEditing(true)
         }
+    
+    func drawcontainerView() {
+        containerView.clipsToBounds = true
+        containerView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+    }
+    
+    func drawcreateAccountTextView() {
+        let attributedString = NSMutableAttributedString(
+            string    : "Alreay have an account? Sign in here.",
+            attributes: [NSAttributedString.Key.font : Font.linkLabel])
+        
+        attributedString.addAttribute(
+            .link,
+            value: "chatsignin://signinAccount",
+            range: (attributedString.string as NSString).range(of: "Sign in here"))
+        
+        signinAccountTextView.attributedText     = attributedString
+        signinAccountTextView.linkTextAttributes = [.foregroundColor: UIColor.secondary, .font: Font.linkLabel]
+        signinAccountTextView.delegate           = self
+        signinAccountTextView.isScrollEnabled    = false
+        signinAccountTextView.textAlignment      = .center
+        signinAccountTextView.isEditable         = false
+    }
 
     
     @IBAction func createAccountButtonTapped(_ sender: Any) {
