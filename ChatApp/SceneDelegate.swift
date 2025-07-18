@@ -43,10 +43,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self.window?.rootViewController = signinVC
         }
         
-        
-        
-        
-        
         self.window?.makeKeyAndVisible()
         
     }
