@@ -164,6 +164,9 @@ class CreateAccountViewController: UIViewController {
                     return
                 }
                 
+                let currentUser = Auth.auth().currentUser
+                currentUser?.displayName
+                
                 Auth.auth().createUser(withEmail: email, password: password) { result, error in
                     self.removeLoadingView()
                     if let error = error {
@@ -174,7 +177,6 @@ class CreateAccountViewController: UIViewController {
                         
                         if let authError = AuthErrorCode(rawValue: errorCode) {
                             // 可以 switch 来区分错误类型了
-                            
                             switch authError {
                             case .emailAlreadyInUse:
                                 errorMessage = "Email already in use."
@@ -193,11 +195,13 @@ class CreateAccountViewController: UIViewController {
                         return
                     }
                     
+                    
                     guard let result = result else {
                         self.presentErrorAlert(title  : "Create Account Failed",
                                                message: "Something went wrong. Please try again later.")
                         return
                     }
+                    
                     
                     let userId = result.user.uid
                     let userData: [String: Any] = [
@@ -216,115 +220,117 @@ class CreateAccountViewController: UIViewController {
                         .setValue(userData)
                     
                     // child(userId) make sure every users is unique the following users can't cover the later users
+                    let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                    let homeVC = mainStoryboard.instantiateViewController(withIdentifier: "HomeViewController")
+                    let navVC = UINavigationController(rootViewController: homeVC)
+                    
+                    let window = UIApplication.shared.connectedScenes
+                        .flatMap{ ($0 as? UIWindowScene)?.windows ?? [] }
+                        .first { $0.isKeyWindow }
+                    
+                    window?.rootViewController = navVC
+                    
+                    
+                    let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
+                    changeRequest?.displayName = username
+                    changeRequest?.commitChanges()
                 
+          }
+   
         }
-        
-        
-        
-            
-            let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let homeVC = mainStoryboard.instantiateViewController(withIdentifier: "HomeViewController")
-            let navVC = UINavigationController(rootViewController: homeVC)
-            /*
-             
-             ❓ Why use UINavigationController(rootViewController: homeVC)?
-
-             To give homeVC a navigation bar, enable a navigation stack (push/pop), and support more complex page transitions.
-
-             ⸻
-
-             ❓ What happens if you don’t use a navigation controller?
-
-             The page will still display correctly, but there will be no navigation bar, and you won’t be able to push new view controllers — only present them modally.
-
-             ⸻
-
-             ❓ Why is the page shown still homeVC?
-
-             Because it is the root view controller of the navigation controller — the first screen in the navigation stack.
-             
-             
-             为什么用 UINavigationController(rootViewController: homeVC)？
-             
-             为了让 homeVC 拥有导航栏，支持页面堆栈结构（push/pop），实现更复杂的页面跳转。
-             
-             如果不加导航控制器，会怎么样？
-             
-             页面显示正常，但没有导航栏，无法用 push 跳转，只能模态弹出（present）。
-             
-             实际显示的页面为什么还是 homeVC？
-             
-             因为它是导航控制器的“第一个页面”，就是 rootViewController。
-             
-             */
-            
-            
-            let window = UIApplication.shared.connectedScenes
-                .flatMap{ ($0 as? UIWindowScene)?.windows ?? [] }
-                .first { $0.isKeyWindow }
-            
-            /*
-             
-             •    Retrieve all scenes from UIApplication.shared.connectedScenes (iOS multi-window architecture);
-             •    Use flatMap to extract all windows from each scene;
-             •    Use .first { $0.isKeyWindow } to get the currently active (visible) window.
-             
-             1. .flatMap { ... }
-                 •    A higher-order function in Swift used to flatten nested collections;
-                 •    You can think of it as map + flatten;
-                 •    In this context, its purpose is:
-             To extract all UIWindow instances from multiple scenes and flatten them into a single [UIWindow] array.
-
-             ⸻
-
-             2. $0 as? UIWindowScene
-                 •    $0 refers to each UIScene passed into the closure;
-                 •    Since connectedScenes is a collection of [UIScene], and we’re only interested in UIWindowScene,
-                 •    We use optional casting as? to attempt converting it to UIWindowScene;
-                 •    If it’s not a UIWindowScene, the result is nil.
-
-             ⸻
-
-             3. ?.windows ?? []
-                 •    .windows is a property provided by UIWindowScene, returning [UIWindow];
-                 •    If the previous optional casting fails (i.e., not a UIWindowScene), it results in nil, and we use ?? [] to default to an empty array to prevent crashing;
-                 •    Therefore, the final return value is always of type [UIWindow].
-             
-             
-             •    从 UIApplication.shared.connectedScenes 获取所有 Scene（iOS 多窗口机制）；
-             •    用 flatMap 提取所有窗口（window）；
-             •    再 .first { $0.isKeyWindow } 拿到当前正在显示的活跃窗口。
-             
-             1. .flatMap { ... }
-                 •    是 Swift 的高阶函数，用于展开（flatten）嵌套的集合；
-                 •    你可以把它看作 map + flatten；
-                 •    这里它的作用是：
-             从多个 scene 中“提取出”所有的 UIWindow，组成一个扁平化的一维数组 [UIWindow]。
-
-             ⸻
-
-             2. $0 as? UIWindowScene
-                 •    $0 是闭包中传入的每一个 UIScene；
-                 •    因为 connectedScenes 是 [UIScene]，而我们只对 UIWindowScene 感兴趣；
-                 •    所以这里用可选类型 as? 来尝试转换为 UIWindowScene；
-                 •    如果不是 UIWindowScene，就返回 nil。
-
-             ⸻
-
-             3. ?.windows ?? []
-                 •    .windows 是 UIWindowScene 提供的属性，返回 [UIWindow]；
-                 •    如果上一步类型转换失败（不是 UIWindowScene），就取 nil，然后返回 [] 空数组，避免崩溃；
-                 •    所以最终的返回值永远是 [UIWindow] 类型。
-             */
-            
-            window?.rootViewController = navVC
-        }
-        
-        
-        
-        
     }
 }
+
+ /*
+  
+  ❓ Why use UINavigationController(rootViewController: homeVC)?
+
+  To give homeVC a navigation bar, enable a navigation stack (push/pop), and support more complex page transitions.
+
+  ⸻
+
+  ❓ What happens if you don’t use a navigation controller?
+
+  The page will still display correctly, but there will be no navigation bar, and you won’t be able to push new view controllers — only present them modally.
+
+  ⸻
+
+  ❓ Why is the page shown still homeVC?
+
+  Because it is the root view controller of the navigation controller — the first screen in the navigation stack.
+  
+  
+  为什么用 UINavigationController(rootViewController: homeVC)？
+  
+  为了让 homeVC 拥有导航栏，支持页面堆栈结构（push/pop），实现更复杂的页面跳转。
+  
+  如果不加导航控制器，会怎么样？
+  
+  页面显示正常，但没有导航栏，无法用 push 跳转，只能模态弹出（present）。
+  
+  实际显示的页面为什么还是 homeVC？
+  
+  因为它是导航控制器的“第一个页面”，就是 rootViewController。
+  
+  */
+ 
+ 
+
+ 
+ /*
+  
+  •    Retrieve all scenes from UIApplication.shared.connectedScenes (iOS multi-window architecture);
+  •    Use flatMap to extract all windows from each scene;
+  •    Use .first { $0.isKeyWindow } to get the currently active (visible) window.
+  
+  1. .flatMap { ... }
+      •    A higher-order function in Swift used to flatten nested collections;
+      •    You can think of it as map + flatten;
+      •    In this context, its purpose is:
+  To extract all UIWindow instances from multiple scenes and flatten them into a single [UIWindow] array.
+
+  ⸻
+
+  2. $0 as? UIWindowScene
+      •    $0 refers to each UIScene passed into the closure;
+      •    Since connectedScenes is a collection of [UIScene], and we’re only interested in UIWindowScene,
+      •    We use optional casting as? to attempt converting it to UIWindowScene;
+      •    If it’s not a UIWindowScene, the result is nil.
+
+  ⸻
+
+  3. ?.windows ?? []
+      •    .windows is a property provided by UIWindowScene, returning [UIWindow];
+      •    If the previous optional casting fails (i.e., not a UIWindowScene), it results in nil, and we use ?? [] to default to an empty array to prevent crashing;
+      •    Therefore, the final return value is always of type [UIWindow].
+  
+  
+  •    从 UIApplication.shared.connectedScenes 获取所有 Scene（iOS 多窗口机制）；
+  •    用 flatMap 提取所有窗口（window）；
+  •    再 .first { $0.isKeyWindow } 拿到当前正在显示的活跃窗口。
+  
+  1. .flatMap { ... }
+      •    是 Swift 的高阶函数，用于展开（flatten）嵌套的集合；
+      •    你可以把它看作 map + flatten；
+      •    这里它的作用是：
+  从多个 scene 中“提取出”所有的 UIWindow，组成一个扁平化的一维数组 [UIWindow]。
+
+  ⸻
+
+  2. $0 as? UIWindowScene
+      •    $0 是闭包中传入的每一个 UIScene；
+      •    因为 connectedScenes 是 [UIScene]，而我们只对 UIWindowScene 感兴趣；
+      •    所以这里用可选类型 as? 来尝试转换为 UIWindowScene；
+      •    如果不是 UIWindowScene，就返回 nil。
+
+  ⸻
+
+  3. ?.windows ?? []
+      •    .windows 是 UIWindowScene 提供的属性，返回 [UIWindow]；
+      •    如果上一步类型转换失败（不是 UIWindowScene），就取 nil，然后返回 [] 空数组，避免崩溃；
+      •    所以最终的返回值永远是 [UIWindow] 类型。
+  */
+ 
 
 extension CreateAccountViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
