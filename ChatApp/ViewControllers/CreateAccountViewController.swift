@@ -165,7 +165,6 @@ class CreateAccountViewController: UIViewController {
                 }
                 
                 let currentUser = Auth.auth().currentUser
-                currentUser?.displayName
                 
                 Auth.auth().createUser(withEmail: email, password: password) { result, error in
                     self.removeLoadingView()
@@ -218,6 +217,8 @@ class CreateAccountViewController: UIViewController {
                         .child("usernames")
                         .child(username)
                         .setValue(userData)
+                    
+                    self.view.endEditing(true) // Dismiss keyboard safely before transition
                     
                     // child(userId) make sure every users is unique the following users can't cover the later users
                     let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
