@@ -11,13 +11,13 @@ import FirebaseDatabase
 
 class CreateAccountViewController: UIViewController {
     
-    @IBOutlet weak var usernameTextField: UITextField!
-    @IBOutlet weak var emailTextField: UITextField!
-    @IBOutlet weak var passwordTextField: UITextField!
+    @IBOutlet weak var usernameTextField    : UITextField!
+    @IBOutlet weak var emailTextField       : UITextField!
+    @IBOutlet weak var passwordTextField    : UITextField!
     @IBOutlet weak var signinAccountTextView: UITextView!
-    @IBOutlet weak var containerView: UIView!
-    @IBOutlet weak var contentView: UIView!
-    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var containerView        : UIView!
+    @IBOutlet weak var contentView          : UIView!
+    @IBOutlet weak var scrollView           : UIScrollView!
     
     var activeTextField: UITextField?
     
@@ -153,30 +153,50 @@ class CreateAccountViewController: UIViewController {
             return
         }
         
+        Database.database().reference().child("username").child(username)
+            .observeSingleEvent(of: .value) { snapshot in
+                guard !snapshot.exists() else {
+                    self.presentErrorAlert(title  : "Usename In Use",
+                                            message: "Please enter a different name to continue.")
+                    return
+                }
+                
+                Auth.auth().createUser(withEmail: email, password: password) { result, error in
+                    if let error = error {
+                        print(error.localizedDescription)
+                        self.presentErrorAlert(title  : "Create Account Failed",
+                                               message: "Something went wrong. Please try again later.")
+                        return
+                    }
+                    
+                    guard let result = result else {
+                        self.presentErrorAlert(title  : "Create Account Failed",
+                                               message: "Something went wrong. Please try again later.")
+                        return
+                    }
+                    
+                    let userId = result.user.uid
+                    let userData: [String: Any] = [
+                        "id": userId,
+                        "username": username
+                    ]
+                    
+                    Database.database().reference()
+                        .child("users")
+                        .child(userId)
+                        .setValue(userData)
+                    
+                    Database.database().reference()
+                        .child("usernames")
+                        .child(username)
+                        .setValue(userData)
+                    
+                    // child(userId) make sure every users is unique the following users can't cover the later users
+                
+        }
         
-        Auth.auth().createUser(withEmail: email, password: password) { result, error in
-            if let error = error {
-                print(error.localizedDescription)
-                self.presentErrorAlert(title  : "Create Account Failed",
-                                       message: "Something went wrong. Please try again later.")
-                return
-            }
-            
-            guard let result = result else {
-                self.presentErrorAlert(title  : "Create Account Failed",
-                                       message: "Something went wrong. Please try again later.")
-                return
-            }
-            
-            let userId = result.user.uid
-            let userData: [String: Any] = [
-                "id": userId,
-                "username": username
-            ]
-            
-            Database.database().reference().child("users").child(userId).setValue(userData)
-            
-            // child(userId) make sure every users is unique the following users can't cover the later users
+        
+        
             
             let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
             let homeVC = mainStoryboard.instantiateViewController(withIdentifier: "HomeViewController")
