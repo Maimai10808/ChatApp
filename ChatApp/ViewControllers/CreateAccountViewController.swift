@@ -153,15 +153,19 @@ class CreateAccountViewController: UIViewController {
             return
         }
         
+        showLoadingView()
+        
         Database.database().reference().child("username").child(username)
             .observeSingleEvent(of: .value) { snapshot in
                 guard !snapshot.exists() else {
                     self.presentErrorAlert(title  : "Usename In Use",
                                             message: "Please enter a different name to continue.")
+                    self.removeLoadingView()
                     return
                 }
                 
                 Auth.auth().createUser(withEmail: email, password: password) { result, error in
+                    self.removeLoadingView()
                     if let error = error {
                         print(error.localizedDescription)
                         self.presentErrorAlert(title  : "Create Account Failed",
