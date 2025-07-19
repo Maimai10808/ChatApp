@@ -168,8 +168,28 @@ class CreateAccountViewController: UIViewController {
                     self.removeLoadingView()
                     if let error = error {
                         print(error.localizedDescription)
+                        var errorMessage = "Something went wrong. Please try again later."
+                        
+                        let errorCode = (error as NSError).code
+                        
+                        if let authError = AuthErrorCode(rawValue: errorCode) {
+                            // 可以 switch 来区分错误类型了
+                            
+                            switch authError {
+                            case .emailAlreadyInUse:
+                                errorMessage = "Email already in use."
+                            case .invalidEmail:
+                                errorMessage = "Invalid email."
+                            case .weakPassword:
+                                errorMessage = "Weak password. Please use at least 6 characters."
+                            default:
+                                break // 使用默认的 errorMessage
+                            }
+                        }
+                        
+                        
                         self.presentErrorAlert(title  : "Create Account Failed",
-                                               message: "Something went wrong. Please try again later.")
+                                               message: errorMessage )
                         return
                     }
                     
