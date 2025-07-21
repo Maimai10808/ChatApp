@@ -69,11 +69,11 @@ class ProfileViewController: UIViewController {
                                                   message: "Select an option.",
                                                   preferredStyle: .actionSheet)
         let cameraAction = UIAlertAction(title: "Camera", style: .default) { _ in
-            
+            self.performSegue(withIdentifier: "UploadViewSegue", sender: nil)
         }
         
         let photoAction  = UIAlertAction(title: "Photo",  style: .default) { _ in
-            
+            self.performSegue(withIdentifier: "UploadViewSegue", sender: nil)
         }
         
         let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { _ in
