@@ -198,15 +198,30 @@ class CreateAccountViewController: UIViewController {
                     strongSelf.view.endEditing(true) // Dismiss keyboard safely before transition
                     
                     // child(userId) make sure every users is unique the following users can't cover the later users
-                    let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
-                    let homeVC = mainStoryboard.instantiateViewController(withIdentifier: "HomeViewController")
-                    let navVC = UINavigationController(rootViewController: homeVC)
                     
-                    let window = UIApplication.shared.connectedScenes
-                        .flatMap{ ($0 as? UIWindowScene)?.windows ?? [] }
-                        .first { $0.isKeyWindow }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                        let homeVC = mainStoryboard.instantiateViewController(withIdentifier: "HomeViewController")
+                        let navVC = UINavigationController(rootViewController: homeVC)
+                        
+                        // Get the foreground active window scene
+                        guard let windowScene = UIApplication.shared.connectedScenes
+                            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+                              let window = windowScene.windows.first(where: { $0.isKeyWindow }) else {
+                            return
+                        }
+                        
+                        // Add transition animation
+                        UIView.transition(with: window,
+                                          duration: 0.3,
+                                          options: .transitionCrossDissolve,
+                                          animations: {
+                            window.rootViewController = navVC
+                        })
+                    }
                     
-                    window?.rootViewController = navVC
+                    
+                    
                 }
             } else {
                 strongSelf.presentErrorAlert(title  : "Usename In Use",

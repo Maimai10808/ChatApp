@@ -141,31 +141,46 @@ class SignInViewController: UIViewController {
         signinUser(email: email, password: password) { [weak self] success, error in
             guard let strongself = self else { return }
             
+            strongself.removeLoadingView()
+            
             if let error = error {
                 print(error)
                 strongself.presentErrorAlert(title: "SignIn Error", message: error)
                 return
             }
             
-            strongself.view.endEditing(true) // Dismiss keyboard safely before transition
+            print("键盘关闭前")
+            strongself.view.endEditing(true)
+            print("键盘关闭后，准备切换视图")
+            //strongself.view.endEditing(true) // Dismiss keyboard safely before transition
             
-            let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let homeVC = mainStoryboard.instantiateViewController(withIdentifier: "HomeViewController")
-            let navVC = UINavigationController(rootViewController: homeVC)
-            
-            let window = UIApplication.shared.connectedScenes
-                .flatMap{ ($0 as? UIWindowScene)?.windows ?? [] }
-                .first { $0.isKeyWindow }
-            
-            window?.rootViewController = navVC
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                let homeVC = mainStoryboard.instantiateViewController(withIdentifier: "HomeViewController")
+                let navVC = UINavigationController(rootViewController: homeVC)
+                
+                // Get the foreground active window scene
+                guard let windowScene = UIApplication.shared.connectedScenes
+                    .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+                      let window = windowScene.windows.first(where: { $0.isKeyWindow }) else {
+                    return
+                }
+                
+                // Add transition animation
+                UIView.transition(with: window,
+                                  duration: 0.3,
+                                  options: .transitionCrossDissolve,
+                                  animations: {
+                    window.rootViewController = navVC
+                })
+            }
             
         }
         
         
+        
         func signinUser(email: String, password: String, completion: @escaping (_ success: Bool, _ error: String?) -> Void) {
             Auth.auth().signIn(withEmail: email, password: password) { _, error in
-                
-                //self.removeLoadingView()
                 
                 if let error = error {
                     print(error.localizedDescription)
@@ -189,7 +204,7 @@ class SignInViewController: UIViewController {
                 }
                completion(true, nil)
                
-            }
+             }
           }
     }
     
