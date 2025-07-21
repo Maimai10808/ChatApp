@@ -137,35 +137,17 @@ class SignInViewController: UIViewController {
         }
         
         showLoadingView()
-        Auth.auth().signIn(withEmail: email, password: password) { _, error in
-            
-            self.removeLoadingView()
+        
+        signinUser(email: email, password: password) { [weak self] success, error in
+            guard let strongself = self else { return }
             
             if let error = error {
-                print(error.localizedDescription)
-                
-                var errorMessage = "Something went wrong. Please try again later."
-                
-                let errorCode = (error as NSError).code
-                
-                if let authError = AuthErrorCode(rawValue: errorCode) {
-                    switch authError {
-                    case .invalidEmail:
-                        errorMessage = "Invalid email."
-                    case .userNotFound:
-                        errorMessage = "Email/password does not match any record."
-                    default:
-                        break
-                    }
-                }
-                
-                self.presentErrorAlert(title  : "Sign In Failed",
-                                       message: errorMessage )
-                
+                print(error)
+                strongself.presentErrorAlert(title: "SignIn Error", message: error)
                 return
             }
             
-            self.view.endEditing(true) // Dismiss keyboard safely before transition
+            strongself.view.endEditing(true) // Dismiss keyboard safely before transition
             
             let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
             let homeVC = mainStoryboard.instantiateViewController(withIdentifier: "HomeViewController")
@@ -176,8 +158,44 @@ class SignInViewController: UIViewController {
                 .first { $0.isKeyWindow }
             
             window?.rootViewController = navVC
+            
         }
+        
+        
+        func signinUser(email: String, password: String, completion: @escaping (_ success: Bool, _ error: String?) -> Void) {
+            Auth.auth().signIn(withEmail: email, password: password) { _, error in
+                
+                //self.removeLoadingView()
+                
+                if let error = error {
+                    print(error.localizedDescription)
+                    
+                    var errorMessage = "Something went wrong. Please try again later."
+                    
+                    let errorCode = (error as NSError).code
+                    
+                    if let authError = AuthErrorCode(rawValue: errorCode) {
+                        switch authError {
+                        case .invalidEmail:
+                            errorMessage = "Invalid email."
+                        case .userNotFound:
+                            errorMessage = "Email/password does not match any record."
+                        default:
+                            break
+                        }
+                    }
+                    completion(false, errorMessage)
+                    return
+                }
+               completion(true, nil)
+               
+            }
+          }
     }
+    
+    
+    
+    
 }
 
 
