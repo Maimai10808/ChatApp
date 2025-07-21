@@ -155,17 +155,22 @@ class CreateAccountViewController: UIViewController {
         
         showLoadingView()
         
-        checkIfExists(username: username) { usernameExists in
+        checkIfExists(username: username) { [weak self] usernameExists in
+            guard let strongSelf = self else { return }
             if !usernameExists {
-                self.createUser(username: username, email: email, password: password) { result, error in
+                strongSelf.createUser(username: username, email: email, password: password) { result, error in
                     
                     if let error = error {
-                        self.presentErrorAlert(title: "Create Account Failed", message: error)
+                        
+                        DispatchQueue.main.async {
+                            strongSelf.presentErrorAlert(title: "Create Account Failed", message: error)
+                        }
+                        
                         return
                     }
                     
                     guard let result = result else {
-                        self.presentErrorAlert(title: "Create Account Failed", message: "Please try again later.")
+                        strongSelf.presentErrorAlert(title: "Create Account Failed", message: "Please try again later.")
                         return
                     }
                     
@@ -190,7 +195,7 @@ class CreateAccountViewController: UIViewController {
                     changeRequest?.displayName = username
                     changeRequest?.commitChanges()
                     
-                    self.view.endEditing(true) // Dismiss keyboard safely before transition
+                    strongSelf.view.endEditing(true) // Dismiss keyboard safely before transition
                     
                     // child(userId) make sure every users is unique the following users can't cover the later users
                     let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
@@ -202,16 +207,11 @@ class CreateAccountViewController: UIViewController {
                         .first { $0.isKeyWindow }
                     
                     window?.rootViewController = navVC
-                    
-                    
-                    
-                    
-                    
                 }
             } else {
-                self.presentErrorAlert(title  : "Usename In Use",
+                strongSelf.presentErrorAlert(title  : "Usename In Use",
                                        message: "Please enter a different name to continue.")
-                self.removeLoadingView()
+                strongSelf.removeLoadingView()
             }
         }
        
@@ -235,8 +235,9 @@ class CreateAccountViewController: UIViewController {
     
     func createUser(username: String, email: String, password: String, completion: @escaping (_ result: AuthDataResult?, _ error: String?) -> Void) {
         
-        Auth.auth().createUser(withEmail: email, password: password) { result, error in
-            self.removeLoadingView()
+        Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
+            guard let strongSelf = self else { return }
+            strongSelf.removeLoadingView()
             if let error = error {
                 print(error.localizedDescription)
                 var errorMessage = "Something went wrong. Please try again later."
@@ -256,9 +257,7 @@ class CreateAccountViewController: UIViewController {
                         break // 使用默认的 errorMessage
                     }
                 }
-                
                 completion(nil, errorMessage)
-                              
                 return
             }
             guard let result = result else {
@@ -266,9 +265,11 @@ class CreateAccountViewController: UIViewController {
                 return
             }
             completion(result, nil)
-            
         }
     }
+    
+    
+    
 }
 
  /*
