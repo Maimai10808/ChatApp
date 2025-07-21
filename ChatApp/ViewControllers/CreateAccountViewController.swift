@@ -129,29 +129,22 @@ class CreateAccountViewController: UIViewController {
     
     
     @IBAction func createAccountButtonTapped(_ sender: Any) {
-        
-        guard let username = usernameTextField.text else {
-            presentErrorAlert(title  : "Username Required",
-                              message: "Please enter a username to continue.")
-            return
-        }
-        
-        guard username.count >= 1 && username.count <= 15 else {
-            presentErrorAlert(title: "Invalid Username", message: "Username must be 1–15 characters long.")
-            return
-        }
-        
-        guard let email    = emailTextField   .text else{
-            presentErrorAlert(title  : "Email Required",
-                              message: "Please enter a Email to continue.")
-            return
-        }
-        
-        guard let password = passwordTextField.text else {
-            presentErrorAlert(title  : "Password Required",
-                              message: "Please enter a Password to continue.")
-            return
-        }
+        // 1. 使用元组一次性获取所有输入字段
+            guard let username = usernameTextField.text?.trimmingCharacters(in: .whitespaces),
+                  let email    = emailTextField.text?.trimmingCharacters(in: .whitespaces),
+                  let password = passwordTextField.text else {
+                presentErrorAlert(title: "Missing Information",
+                                  message: "Please fill in all required fields.")
+                return
+            }
+            
+            // 2. 统一验证所有条件
+            let validation = validateInputs(username: username, email: email, password: password)
+            guard validation.isValid else {
+                presentErrorAlert(title: validation.errorTitle ?? "Validation Error",
+                                  message: validation.errorMessage ?? "Please check your inputs")
+                return
+            }
         
         showLoadingView()
         
@@ -195,8 +188,11 @@ class CreateAccountViewController: UIViewController {
                     changeRequest?.displayName = username
                     changeRequest?.commitChanges()
                     
-                    strongSelf.view.endEditing(true) // Dismiss keyboard safely before transition
                     
+                    
+                    print("键盘关闭前")
+                    strongSelf.view.endEditing(true) // Dismiss keyboard safely before transition
+                    print("键盘关闭后，准备切换视图")
                     // child(userId) make sure every users is unique the following users can't cover the later users
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -219,8 +215,6 @@ class CreateAccountViewController: UIViewController {
                             window.rootViewController = navVC
                         })
                     }
-                    
-                    
                     
                 }
             } else {
@@ -281,6 +275,33 @@ class CreateAccountViewController: UIViewController {
             }
             completion(result, nil)
         }
+    }
+    
+    // 3. 提取验证逻辑到独立方法
+    private func validateInputs(username: String, email: String, password: String) -> (isValid: Bool, errorTitle: String?, errorMessage: String?) {
+        // 检查用户名长度
+        if username.count < 1 || username.count > 15 {
+            return (false, "Invalid Username", "Username must be 1–15 characters long.")
+        }
+        
+        // 检查邮箱格式
+        if !isValidEmail(email) {
+            return (false, "Invalid Email", "Please enter a valid email address.")
+        }
+        
+        // 检查密码强度
+        if password.count < 6 {
+            return (false, "Weak Password", "Password must be at least 6 characters long.")
+        }
+        
+        return (true, nil, nil)
+    }
+
+    // 4. 添加邮箱格式验证
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
+        return emailPredicate.evaluate(with: email)
     }
     
     
